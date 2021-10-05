@@ -4,6 +4,6 @@ import { PlacesModule } from './places/places.module';
 // Decorator, é sempre identificado com um sinal de @
 // dependency inject.
 @Module({
-  imports: [PlacesModule] 
+  imports: [PlacesModule],
 })
 export class AppModule {}
