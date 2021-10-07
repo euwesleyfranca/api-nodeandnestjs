@@ -12,6 +12,7 @@ import { CreatePlaceDto } from './dto/create-place.dto';
 import { GetPlacesFilterDto } from './dto/get-places-filter.dto';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UpdatePlaceStatusDto } from './dto/update-place-status.dto';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import { Place } from './places.model';
 import { PlacesService } from './places.service';
 
@@ -40,14 +41,29 @@ export class PlacesController {
   @Patch('/:id/status')
   updatePlaceStatus(
     @Param('id') id: string,
-    @Body() UpdatePlaceStatusDto: UpdatePlaceStatusDto,
+    @Body() updatePlaceStatusDto: UpdatePlaceStatusDto,
   ): Place {
-    const { status } = UpdatePlaceStatusDto;
+    const { status } = updatePlaceStatusDto;
     return this.placesServices.updatePlaceStatus(id, status);
   }
 
-  // @Patch('/:id/profile')
-  // updatePlaceProfile()
+  @Patch('/:id/profile')
+  updateProfile(
+    @Param('id') id: string,
+    @Body() updateProfileDto: UpdateProfileDto,
+  ): Place {
+    const { name, site, address, image, ticket, description } =
+      updateProfileDto;
+    return this.placesServices.updateProfile(
+      id,
+      name,
+      site,
+      address,
+      image,
+      ticket,
+      description,
+    );
+  }
 
   @Delete('/:id')
   deletePlace(@Param('id') id: string): void {

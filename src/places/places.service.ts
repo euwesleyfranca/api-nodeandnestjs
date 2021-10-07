@@ -69,5 +69,23 @@ export class PlacesService {
     return place;
   }
 
-  /* updatePlace(): Place {} */
+  updateProfile(
+    id: string,
+    name: string,
+    site: string,
+    address: string,
+    image: string,
+    ticket: string,
+    description: string,
+  ): Place {
+    const profile = this.getPlaceById(id);
+    profile.name = name;
+    profile.site = site;
+    profile.address = address;
+    profile.image = image;
+    profile.ticket = ticket;
+    profile.description = description;
+
+    return profile;
+  }
 }
