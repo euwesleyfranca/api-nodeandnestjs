@@ -7,6 +7,7 @@ import { GetPlacesFilterDto } from './dto/get-places-filter.dto';
 @Injectable()
 export class PlacesService {
   private places: Place[] = [];
+
   getAllPlaces(): Place[] {
     return this.places;
   }
