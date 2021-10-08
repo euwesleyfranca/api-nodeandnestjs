@@ -20,11 +20,10 @@ export class PlacesRepository extends Repository<Place> {
     }
     if (search) {
       query.andWhere(
-        'LOWER(place.name) LIKE LOWER(:search) OR LOWER(place.description) LIKE LOWER(:search) OR LOWER(place.address) LIKE LOWER(:search) LIKE LOWER(:search)',
+        'LOWER(place.name) LIKE LOWER(:search) OR LOWER(place.description) LIKE LOWER(:search) OR LOWER(place.address) LIKE LOWER(:search)',
         { search: `%${search}%` },
       );
     }
-
     const places = await query.getMany();
 
     return places;
