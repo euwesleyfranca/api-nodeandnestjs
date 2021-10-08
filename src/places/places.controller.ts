@@ -13,36 +13,33 @@ import { GetPlacesFilterDto } from './dto/get-places-filter.dto';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { UpdatePlaceStatusDto } from './dto/update-place-status.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
-import { Place } from './places.model';
+import { Place } from './place.entity';
 import { PlacesService } from './places.service';
 
 @Controller('places')
 export class PlacesController {
   constructor(private placesServices: PlacesService) {}
-  @Get()
-  getPlaces(@Query() filterDto: GetPlacesFilterDto): Place[] {
-    if (Object.keys(filterDto).length) {
-      return this.placesServices.getPlacesWithFilters(filterDto);
-    } else {
-      return this.placesServices.getAllPlaces();
-    }
-  }
 
   @Get('/:id')
-  getPlaceById(@Param('id') id: string): Place {
+  getPlaceById(@Param('id') id: string): Promise<Place> {
     return this.placesServices.getPlaceById(id);
   }
 
   @Post()
-  createPlace(@Body() createPlaceDto: CreatePlaceDto): Place {
+  createPlace(@Body() createPlaceDto: CreatePlaceDto): Promise<Place> {
     return this.placesServices.createPlace(createPlaceDto);
+  }
+
+  @Get()
+  getPlaces(@Query() filterDto: GetPlacesFilterDto): Promise<Place[]> {
+    return this.placesServices.getPlaces(filterDto);
   }
 
   @Patch('/:id/status')
   updatePlaceStatus(
     @Param('id') id: string,
     @Body() updatePlaceStatusDto: UpdatePlaceStatusDto,
-  ): Place {
+  ): Promise<Place> {
     const { status } = updatePlaceStatusDto;
     return this.placesServices.updatePlaceStatus(id, status);
   }
@@ -51,7 +48,7 @@ export class PlacesController {
   updateProfile(
     @Param('id') id: string,
     @Body() updateProfileDto: UpdateProfileDto,
-  ): Place {
+  ): Promise<Place> {
     const { name, site, address, image, ticket, description } =
       updateProfileDto;
     return this.placesServices.updateProfile(
@@ -66,7 +63,7 @@ export class PlacesController {
   }
 
   @Delete('/:id')
-  deletePlace(@Param('id') id: string): void {
+  deletePlace(@Param('id') id: string): Promise<void> {
     return this.placesServices.deletePlace(id);
   }
 }

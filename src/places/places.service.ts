@@ -1,76 +1,46 @@
-import { Injectable } from '@nestjs/common';
-import { Place, PlaceStatus } from './places.model';
-import { v4 as uuid } from 'uuid';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { PlaceStatus } from './places-status.enum';
 import { CreatePlaceDto } from './dto/create-place.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PlacesRepository } from './place.repository';
+import { Place } from './place.entity';
 import { GetPlacesFilterDto } from './dto/get-places-filter.dto';
 
 @Injectable()
 export class PlacesService {
-  private places: Place[] = [];
+  constructor(
+    @InjectRepository(PlacesRepository)
+    private placesRepository: PlacesRepository,
+  ) {}
 
-  getAllPlaces(): Place[] {
-    return this.places;
-  }
+  async getPlaceById(id: string): Promise<Place> {
+    const found = await this.placesRepository.findOne(id);
 
-  getPlacesWithFilters(filterDto: GetPlacesFilterDto): Place[] {
-    const { status, search } = filterDto;
-    let places = this.getAllPlaces();
-
-    if (status) {
-      places = places.filter((place) => place.status === status);
+    if (!found) {
+      throw new NotFoundException(`Id ${id} não encontrado`);
     }
 
-    if (search) {
-      places = places.filter((place) => {
-        const s: string = search.toLocaleLowerCase();
-        if (
-          place.name.toLowerCase().includes(s) ||
-          place.description.toLowerCase().includes(s) ||
-          place.address.toLowerCase().includes(s) ||
-          place.site.toLowerCase().includes(s)
-        ) {
-          return true;
-        }
-        return false;
-      });
-    }
-
-    return places;
+    return found;
   }
 
-  getPlaceById(id: string): Place {
-    return this.places.find((place) => place.id === id);
+  async createPlace(createPlaceDto: CreatePlaceDto): Promise<Place> {
+    return await this.placesRepository.createPlace(createPlaceDto);
   }
 
-  createPlace(createPlaceDto: CreatePlaceDto): Place {
-    const { name, site, address, image, ticket, description } = createPlaceDto;
-
-    const place: Place = {
-      id: uuid(),
-      name,
-      site,
-      address,
-      image,
-      ticket,
-      description,
-      status: PlaceStatus.ACTIVE,
-    };
-    this.places.push(place);
-    return place;
+  async getPlaces(filterDto: GetPlacesFilterDto): Promise<Place[]> {
+    return this.placesRepository.getPlaces(filterDto);
   }
 
-  deletePlace(id: string): void {
-    const found = this.getPlaceById(id);
-    this.places = this.places.filter((place) => place.id !== found.id);
-  }
-
-  updatePlaceStatus(id: string, status: PlaceStatus): Place {
-    const place = this.getPlaceById(id);
+  async updatePlaceStatus(id: string, status: PlaceStatus): Promise<Place> {
+    const place = await this.getPlaceById(id);
     place.status = status;
+
+    await this.placesRepository.save(place);
+
     return place;
   }
 
-  updateProfile(
+  async updateProfile(
     id: string,
     name: string,
     site: string,
@@ -78,8 +48,8 @@ export class PlacesService {
     image: string,
     ticket: string,
     description: string,
-  ): Place {
-    const profile = this.getPlaceById(id);
+  ): Promise<Place> {
+    const profile = await this.getPlaceById(id);
     profile.name = name;
     profile.site = site;
     profile.address = address;
@@ -87,6 +57,15 @@ export class PlacesService {
     profile.ticket = ticket;
     profile.description = description;
 
+    await this.placesRepository.save(profile);
     return profile;
+  }
+
+  async deletePlace(id: string): Promise<void> {
+    const found = await this.placesRepository.delete(id);
+
+    if (found.affected === 0) {
+      throw new NotFoundException('Lugar não encontrado');
+    }
   }
 }

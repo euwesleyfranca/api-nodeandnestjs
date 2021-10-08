@@ -1,5 +1,4 @@
 import { IsFQDN, IsNotEmpty } from 'class-validator';
-
 /* eslint-disable prettier/prettier*/
 export class CreatePlaceDto {
   @IsNotEmpty({ message: 'Campo nome é obrigatório!' })
@@ -19,5 +18,6 @@ export class CreatePlaceDto {
   ticket: string;
   
   @IsNotEmpty({ message: 'Campo descrição é obrigatório!'})
-  description: string;
+  description: string;  
+  
 }

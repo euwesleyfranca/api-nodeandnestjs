@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  #app:
+  #  build:
+  #   dockerfile: Dockerfile
+  #   context: .
+
+  #  command: npm run start:dev
+  #  ports: 
+  #    - "3000:3000"
+  #  volumes:
+  #    - .:/usr/src/app
+  #    - /usr/src/app/node_modules
+
+   # command: npm run start:dev
+
+  mysql:
+    container_name: mysql
+    restart: unless-stopped
+    image: mysql:8.0
+    environment:
+      SERVICE_NAME: "mysql"
+      MYSQL_ROOT_NAME: "root"
+      MYSQL_ROOT_PASSWORD: "root"     
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql-init/mysql-init.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+
